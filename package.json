@@ -1,0 +1,47 @@
+{
+  "name": "lumen",
+  "version": "1.0.0",
+  "description": "LumNote - Minimal Markdown Notes",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:clean": "node -e \"try{require('fs').rmSync('dist',{recursive:true,force:true})}catch(e){}\" && electron-builder"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "build": {
+    "appId": "com.lumnote.app",
+    "productName": "LumNote",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**",
+      "renderer/**",
+      "assets/**",
+      "ico.png"
+    ],
+    "icon": "assets/icons/ico.png",
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": ["zh-CN", "en"],
+      "language": "2052"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^25.1.8"
+  }
+}

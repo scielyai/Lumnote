@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://127.0.0.1:7728">
+  <title>LumNote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+      <div id="app">
+    <nav id="vertical-nav" class="vertical-nav">
+      <div class="nav-icon-btn active" id="nav-projects" title="项目">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="nav-icon-btn" id="nav-guide" title="指南与协议">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="nav-spacer"></div>
+    </nav>
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-toolbar">
+        <span class="toolbar-title">项目</span>
+        <span class="toolbar-actions">
+          <button class="toolbar-btn" id="add-project-btn" title="新建项目">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </span>
+      </div>
+      <div class="sidebar-content">
+        <div id="sidebar-projects" class="sidebar-panel">
+          <div id="projects-list" class="projects-list"></div>
+          <div id="empty-state" class="empty-state hidden"></div>
+        </div>
+      </div>
+      <div id="context-menu" class="context-menu hidden"></div>
+    </aside>
+    <div class="resizer resizer-sidebar" id="resizer-sidebar"></div>
+    <main id="main" class="main">
+      <div id="tabs-bar" class="tabs-bar">
+        <div class="tabs-bar-main">
+          <button type="button" class="tabs-bar-sidebar-toggle" id="tabs-bar-sidebar-toggle" title="折叠左栏" aria-label="折叠">
+            <svg class="sidebar-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div id="note-tabs-container" class="note-tabs-container"></div>
+          <div class="resizer resizer-tabs" id="resizer-tabs"></div>
+          <div id="inbox-tab-container" class="inbox-tab-container hidden">
+            <span class="inbox-tab-label"></span>
+          </div>
+        </div>
+        <div class="tabs-bar-window">
+          <button type="button" class="editor-nav-btn inbox-toggle-btn" id="inbox-toggle-btn" title="" aria-label="">
+            <svg class="inbox-toggle-icon" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="7 2 4 5 7 8"/></svg>
+          </button>
+          <button type="button" class="win-btn win-btn-minimize" title="最小化" aria-label="最小化">
+            <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor"><rect width="10" height="1"/></svg>
+          </button>
+          <button type="button" class="win-btn win-btn-maximize" title="最大化" aria-label="最大化">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0.5" y="0.5" width="9" height="9" rx="0.5"/></svg>
+          </button>
+          <button type="button" class="win-btn win-btn-close" title="关闭" aria-label="关闭">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l8 8M9 1L1 9"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="dual-inbox-layout" class="dual-inbox-layout hidden">
+        <div class="dual-inbox-left" id="dual-inbox-left">
+          <div class="tabs-bar tabs-bar-note" id="dual-inbox-tabs-left"></div>
+          <div class="dual-inbox-editor-left" id="dual-inbox-editor-left"></div>
+        </div>
+        <div class="resizer resizer-inbox" id="resizer-inbox"></div>
+        <div class="dual-inbox-right" id="dual-inbox-right">
+          <div class="tabs-bar tabs-bar-inbox" id="dual-inbox-tabs-right">
+            <div class="tabs-bar-inbox-main"></div>
+            <div class="inbox-header-win-buttons">
+              <button type="button" class="win-btn win-btn-minimize" title="最小化" aria-label="最小化">
+                <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor"><rect width="10" height="1"/></svg>
+              </button>
+              <button type="button" class="win-btn win-btn-maximize" title="最大化" aria-label="最大化">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0.5" y="0.5" width="9" height="9" rx="0.5"/></svg>
+              </button>
+              <button type="button" class="win-btn win-btn-close" title="关闭" aria-label="关闭">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l8 8M9 1L1 9"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="dual-inbox-editor-right" id="dual-inbox-editor-right"></div>
+        </div>
+      </div>
+      <div id="editor-area" class="editor-area">
+        <div id="single-pane" class="pane single-pane">
+          <div id="placeholder" class="placeholder">
+            <span class="placeholder-icon">◇</span>
+            <span id="placeholder-text">选择项目或暂存区开始</span>
+          </div>
+          <div id="editor-wrapper" class="editor-wrapper hidden">
+            <div class="editor-nav-bar">
+              <button class="editor-nav-btn" id="editor-undo" title="撤销"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg></button>
+              <button class="editor-nav-btn" id="editor-redo" title="恢复"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19m0 0l-6-6m6 6l-6 6"/></svg></button>
+            </div>
+            <textarea id="editor" class="editor" spellcheck="false"></textarea>
+          </div>
+          <div id="guide-panel" class="guide-panel hidden">
+            <div id="guide-sidebar" class="guide-sidebar">
+              <div class="guide-item active" data-guide="readme"></div>
+              <div class="guide-item" data-guide="license"></div>
+              <div class="guide-item" data-guide="storage"></div>
+              <div class="guide-item" data-guide="lang"></div>
+            </div>
+            <div class="guide-main">
+              <div class="guide-header-win-buttons">
+                <button type="button" class="win-btn win-btn-minimize" title="最小化" aria-label="最小化">
+                  <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor"><rect width="10" height="1"/></svg>
+                </button>
+                <button type="button" class="win-btn win-btn-maximize" title="最大化" aria-label="最大化">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0.5" y="0.5" width="9" height="9" rx="0.5"/></svg>
+                </button>
+                <button type="button" class="win-btn win-btn-close" title="关闭" aria-label="关闭">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l8 8M9 1L1 9"/></svg>
+                </button>
+              </div>
+              <div id="guide-content" class="guide-content"></div>
+            </div>
+          </div>
+        </div>
+        <div id="dual-pane-container" class="dual-pane-container hidden">
+          <div class="pane left-pane">
+            <div class="editor-nav-bar">
+              <button class="editor-nav-btn editor-left-undo" title="撤销"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg></button>
+              <button class="editor-nav-btn editor-left-redo" title="恢复"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19m0 0l-6-6m6 6l-6 6"/></svg></button>
+            </div>
+            <textarea id="editor-left" class="editor" spellcheck="false"></textarea>
+          </div>
+          <div class="resizer resizer-panes" id="resizer-panes"></div>
+          <div class="pane right-pane">
+            <div class="editor-nav-bar editor-nav-bar-inbox">
+              <div class="editor-nav-group">
+                <button class="editor-nav-btn editor-right-undo" title="撤销"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg></button>
+                <button class="editor-nav-btn editor-right-redo" title="恢复"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19m0 0l-6-6m6 6l-6 6"/></svg></button>
+              </div>
+            </div>
+            <textarea id="editor-right" class="editor" spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="modal" class="modal hidden">
+    <div class="modal-content modal-note">
+      <label id="modal-label">笔记名称</label>
+      <input type="text" id="modal-input" class="modal-input" />
+      <label class="modal-check">
+        <input type="checkbox" id="modal-use-template" />
+        <span id="modal-template-label">使用 MD 模板</span>
+      </label>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-secondary">取消</button>
+        <button id="modal-confirm" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="modal-project" class="modal hidden">
+    <div class="modal-content modal-project">
+      <label id="modal-project-label">项目名称</label>
+      <input type="text" id="modal-project-input" class="modal-input" />
+      <label class="modal-check">
+        <input type="checkbox" id="modal-project-use-template" />
+        <span id="modal-project-template-label">使用默认 Markdown 模板</span>
+      </label>
+      <div class="modal-actions">
+        <button id="modal-project-cancel" class="btn btn-secondary">取消</button>
+        <button id="modal-project-confirm" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="editor-context-menu" class="context-menu hidden"></div>
+  <div id="tab-context-menu" class="context-menu hidden"></div>
+  <div id="modal-rename" class="modal hidden">
+    <div class="modal-content">
+      <label id="modal-rename-label">重命名</label>
+      <input type="text" id="modal-rename-input" class="modal-input" />
+      <div class="modal-actions">
+        <button id="modal-rename-cancel" class="btn btn-secondary">取消</button>
+        <button id="modal-rename-confirm" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="modal-alert" class="modal hidden">
+    <div class="modal-content">
+      <p id="modal-alert-text" class="modal-alert-text"></p>
+      <div class="modal-actions">
+        <button id="modal-alert-ok" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="modal-confirm-dlg" class="modal hidden">
+    <div class="modal-content">
+      <p id="modal-confirm-text" class="modal-alert-text"></p>
+      <div class="modal-actions">
+        <button id="modal-confirm-cancel" class="btn btn-secondary">取消</button>
+        <button id="modal-confirm-ok" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="lang-popover" class="lang-popover hidden">
+    <div class="lang-option" data-lang="zh">中文</div>
+    <div class="lang-option" data-lang="en">English</div>
+    <div class="lang-option" data-lang="fr">Français</div>
+    <div class="lang-option" data-lang="ko">한국어</div>
+    <div class="lang-option" data-lang="it">Italiano</div>
+    <div class="lang-option" data-lang="ja">日本語</div>
+  </div>
+  <div id="autocomplete" class="autocomplete hidden"></div>
+  <div id="move-menu" class="move-menu hidden">
+    <div class="move-menu-title">移动到项目</div>
+  </div>
+  <div id="custom-tooltip" class="custom-tooltip" aria-hidden="true"></div>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

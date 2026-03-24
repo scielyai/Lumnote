@@ -1,0 +1,30 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+build/
+out/
+*.exe
+*.dmg
+
+# 环境与配置 (含密钥)
+.env
+.env.local
+.env.*.local
+
+# 日志与用户数据 (隐私保护)
+*.log
+logs/
+casuallog.md
+data/
+*.tmp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
