@@ -1,0 +1,38 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*' # 当推送 v1.0.0 这样的标签时自动触发
+  workflow_dispatch: # 【关键】这行代码让你能看到绿色的手动运行按钮
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build App
+        run: npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: LumNote-${{ matrix.os }}
+          path: dist/
