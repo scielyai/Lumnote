@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # LumNote
 
 **本地优先，极简高效，专注 Markdown 知识管理。**
@@ -52,3 +53,7 @@ This project is licensed under the MIT License.
 ## Maintainer
 
 - [Your Name]
+=======
+# Lumnote
+LumNote is a minimalist, distraction-free Electron app for local-first notes. Featuring a dual-track workflow (Projects &amp; Inbox), it offers dual-pane editing, auto-save, linking, and attachments. Seamlessly switch between capturing ideas and structuring knowledge while ensuring data privacy. Focus on what matters, without the noise.
+>>>>>>> 0b3cb195e98c6633151d71c50fb8e46d315a86fd
