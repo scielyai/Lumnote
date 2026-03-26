@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # LumNote
 
 **本地优先，极简高效，专注 Markdown 知识管理。**
