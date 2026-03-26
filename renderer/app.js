@@ -172,9 +172,7 @@ function setVerticalNavActive(which) {
 }
 
 async function init() {
-  const l = localStorage.getItem('lumen_lang') || (navigator.language || '').toLowerCase().slice(0, 2);
-  const langMap = { zh: 'zh-CN', en: 'en', fr: 'fr', ko: 'ko', it: 'it', ja: 'ja' };
-  document.documentElement.lang = ['zh', 'en', 'fr', 'ko', 'it', 'ja'].includes(l) ? (langMap[l] || l) : 'zh-CN';
+  if (typeof window.syncDocumentLang === 'function') window.syncDocumentLang();
   await window.lumenAPI.ensureKnowledgeBase();
   try {
     await window.lumenAPI.ensureInbox();
@@ -208,14 +206,107 @@ function updateUIText() {
   if (empty) empty.textContent = t('emptyHint');
   const title = document.querySelector('.toolbar-title');
   if (title) title.textContent = t('appTitle') || t('projects');
+  const navProj = $('nav-projects');
+  if (navProj) {
+    navProj.title = t('projects');
+    navProj.setAttribute('aria-label', t('projects'));
+  }
   const navGuide = $('nav-guide');
   if (navGuide) navGuide.title = t('guideAndLicense') || t('guide');
+  const addProjectBtn = $('add-project-btn');
+  if (addProjectBtn) {
+    addProjectBtn.title = t('newProject');
+    addProjectBtn.setAttribute('aria-label', t('newProject'));
+  }
+  const sideToggle = $('tabs-bar-sidebar-toggle');
+  if (sideToggle) {
+    const fold = t('sidebarFold');
+    sideToggle.title = fold;
+    sideToggle.setAttribute('aria-label', fold);
+  }
+  document.querySelectorAll('.win-btn-minimize').forEach((btn) => {
+    const tx = t('windowMinimize');
+    btn.title = tx;
+    btn.setAttribute('aria-label', tx);
+  });
+  document.querySelectorAll('.win-btn-close').forEach((btn) => {
+    const tx = t('windowClose');
+    btn.title = tx;
+    btn.setAttribute('aria-label', tx);
+  });
+  document.querySelectorAll('#editor-undo, .editor-left-undo, .editor-right-undo').forEach((btn) => {
+    const tx = t('undo');
+    btn.title = tx;
+    btn.setAttribute('aria-label', tx);
+  });
+  document.querySelectorAll('#editor-redo, .editor-left-redo, .editor-right-redo').forEach((btn) => {
+    const tx = t('redo');
+    btn.title = tx;
+    btn.setAttribute('aria-label', tx);
+  });
+  const mc = $('modal-cancel');
+  const mconf = $('modal-confirm');
+  if (mc) mc.textContent = t('cancel');
+  if (mconf) mconf.textContent = t('confirm');
+  const mpc = $('modal-project-cancel');
+  const mpconf = $('modal-project-confirm');
+  if (mpc) mpc.textContent = t('cancel');
+  if (mpconf) mpconf.textContent = t('confirm');
+  const mrc = $('modal-rename-cancel');
+  const mrconf = $('modal-rename-confirm');
+  if (mrc) mrc.textContent = t('cancel');
+  if (mrconf) mrconf.textContent = t('confirm');
+  const maok = $('modal-alert-ok');
+  if (maok) maok.textContent = t('confirm');
+  const mco = $('modal-confirm-ok');
+  const mcc = $('modal-confirm-cancel');
+  if (mco) mco.textContent = t('confirm');
+  if (mcc) mcc.textContent = t('cancel');
+  const modalLabel = $('modal-label');
+  if (modalLabel) modalLabel.textContent = t('noteName');
+  const modalProjectLabel = $('modal-project-label');
+  if (modalProjectLabel) modalProjectLabel.textContent = t('projectNameLabel');
+  const modalRenameLabel = $('modal-rename-label');
+  if (modalRenameLabel) modalRenameLabel.textContent = t('rename');
+  const modalTpl = $('modal-template-label');
+  if (modalTpl) modalTpl.textContent = t('useTemplate');
+  const modalProjTpl = $('modal-project-template-label');
+  if (modalProjTpl) modalProjTpl.textContent = t('useProjectTemplate');
+  document.querySelectorAll('#lang-popover .lang-option').forEach((el) => {
+    const labels = { zh: '中文', en: 'English', fr: 'Français', ja: '日本語', ko: '한국어', de: 'Deutsch', it: 'Italiano' };
+    const c = el.dataset.lang;
+    if (c && labels[c]) el.textContent = labels[c];
+  });
   document.querySelectorAll('.guide-item[data-guide="readme"]').forEach(el => { el.textContent = t('guideReadme'); });
   document.querySelectorAll('.guide-item[data-guide="license"]').forEach(el => { el.textContent = t('guideLicense'); });
-  document.querySelectorAll('.guide-item[data-guide="version"]').forEach(el => { el.textContent = t('guideVersion'); });
   document.querySelectorAll('.guide-item[data-guide="storage"]').forEach(el => { el.textContent = t('guideStorage'); });
-  document.querySelectorAll('.guide-item[data-guide="lang"]').forEach(el => { el.textContent = t('languageSettings') || '语言 / Language'; });
+  document.querySelectorAll('.guide-item[data-guide="lang"]').forEach(el => { el.textContent = t('languageSettings'); });
   syncInboxToggleButton();
+  refreshWindowMaximizeTitles();
+}
+
+function refreshWindowMaximizeTitles() {
+  if (!window.lumenAPI?.windowIsMaximized) {
+    const tx = t('windowMaximize');
+    document.querySelectorAll('.win-btn-maximize').forEach((btn) => {
+      btn.title = tx;
+      btn.setAttribute('aria-label', tx);
+    });
+    return;
+  }
+  window.lumenAPI.windowIsMaximized().then((isMax) => {
+    const tx = isMax ? t('windowRestore') : t('windowMaximize');
+    document.querySelectorAll('.win-btn-maximize').forEach((btn) => {
+      btn.title = tx;
+      btn.setAttribute('aria-label', tx);
+    });
+  }).catch(() => {
+    const tx = t('windowMaximize');
+    document.querySelectorAll('.win-btn-maximize').forEach((btn) => {
+      btn.title = tx;
+      btn.setAttribute('aria-label', tx);
+    });
+  });
 }
 
 function syncInboxToggleButton() {
@@ -356,7 +447,7 @@ async function openInbox() {
   $('editor-left').dataset.tabId = prevTab ? state.activeTabId : '';
   let content = await window.lumenAPI.readInboxDay(state.inboxCurrentDay);
   if (!content || !content.trim()) {
-    content = `# ${t('inbox')}\n\n在此记录临时想法，稍后整理到项目中`;
+    content = `# ${t('inbox')}\n\n${t('inboxDefaultBody')}`;
   }
   $('editor-right').value = content;
   $('editor-right').dataset.pane = 'inbox';
@@ -473,7 +564,7 @@ function exitGuideMode() {
 
 function isInboxDefaultContent(content) {
   const t1 = content.trim();
-  const t2 = `# ${t('inbox')}\n\n在此记录临时想法，稍后整理到项目中`.trim();
+  const t2 = `# ${t('inbox')}\n\n${t('inboxDefaultBody')}`.trim();
   return t1 === t2;
 }
 
@@ -708,15 +799,17 @@ function bindEvents() {
         setTimeout(async () => {
           if (!window.lumenAPI.windowIsMaximized) return;
           const isMax = await window.lumenAPI.windowIsMaximized();
+          const tx = isMax ? t('windowRestore') : t('windowMaximize');
           document.querySelectorAll('.win-btn-maximize').forEach(btn => {
-            btn.title = isMax ? '还原' : '最大化';
+            btn.title = tx;
+            btn.setAttribute('aria-label', tx);
           });
         }, 150);
       };
     });
     document.querySelectorAll('.win-btn-close').forEach(el => {
       el.onclick = async () => {
-        const ok = await showConfirm(t('confirmCloseWindow') || '确定要关闭窗口吗？');
+        const ok = await showConfirm(t('confirmCloseWindow'));
         if (ok && window.lumenAPI) window.lumenAPI.windowClose();
       };
     });
@@ -1106,20 +1199,21 @@ async function renderGuideContent(which) {
     `;
   } else if (which === 'lang') {
     const langs = [
-      { code: 'zh', label: '中文' },
       { code: 'en', label: 'English' },
+      { code: 'zh', label: '中文' },
       { code: 'fr', label: 'Français' },
-      { code: 'ko', label: '한국어' },
-      { code: 'it', label: 'Italiano' },
       { code: 'ja', label: '日本語' },
+      { code: 'ko', label: '한국어' },
+      { code: 'de', label: 'Deutsch' },
+      { code: 'it', label: 'Italiano' },
     ];
     const current = getLang();
     content.innerHTML = `
-      <h1>${t('languageSettings') || '语言设置'}</h1>
+      <h1>${t('languageSettings')}</h1>
       <div class="settings-lang-list">
         ${langs.map(l => `<button type="button" class="settings-lang-option${l.code === current ? ' active' : ''}" data-lang="${l.code}">${l.label}</button>`).join(' ')}
       </div>
-      <p style="font-size:12px;color:var(--text-muted)">${t('storageReloadHint') || ''}</p>
+      <p style="font-size:12px;color:var(--text-muted)">${t('storageReloadHint')}</p>
     `;
     content.querySelectorAll('.settings-lang-option').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -1745,7 +1839,7 @@ async function showNoteModal(projectName) {
   $('modal-label').textContent = t('noteName');
   const input = $('modal-input');
   input.value = defaultName;
-  input.placeholder = '例如: 2026-03-02.md';
+  input.placeholder = t('noteNamePlaceholder');
   $('modal-use-template').checked = false;
   $('modal-template-label').textContent = t('useTemplate');
   $('modal').classList.remove('hidden');
@@ -1777,7 +1871,7 @@ function confirmNoteModal() {
 let projectModalResolve = null;
 
 function showNewProjectModal(initialValue = '') {
-  $('modal-project-label').textContent = t('newProject');
+  $('modal-project-label').textContent = t('projectNameLabel');
   $('modal-project-input').value = initialValue;
   const tplCheck = $('modal-project-use-template');
   if (tplCheck) tplCheck.checked = false;
@@ -2266,7 +2360,7 @@ async function openOrCreateLink(project, note, editorEl) {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => init().catch(err => { console.error('Lumen init failed:', err); showAlert('启动失败: ' + err.message); }));
+  document.addEventListener('DOMContentLoaded', () => init().catch(err => { console.error('Lumen init failed:', err); showAlert(t('startupFailed') + ': ' + err.message); }));
 } else {
-  init().catch(err => { console.error('Lumen init failed:', err); showAlert('启动失败: ' + err.message); });
+  init().catch(err => { console.error('Lumen init failed:', err); showAlert(t('startupFailed') + ': ' + err.message); });
 }

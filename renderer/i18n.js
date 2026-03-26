@@ -1,5 +1,7 @@
-const LANGS = { zh: 'zh-CN', en: 'en', fr: 'fr', ko: 'ko', it: 'it', ja: 'ja' };
-const DEFAULT_LANG = 'zh';
+const LANGS = { zh: 'zh-CN', en: 'en', fr: 'fr', ko: 'ko', it: 'it', ja: 'ja', de: 'de' };
+const DEFAULT_LANG = 'en';
+
+const LANG_DETECTION_ORDER = ['zh', 'en', 'fr', 'ja', 'ko', 'de', 'it'];
 
 const translations = {
   zh: {
@@ -12,7 +14,7 @@ const translations = {
     openAttachment: '打开文件',
     toggleImageThumb: '缩略图模式',
     toggleImageMarkdown: 'Markdown 模式',
-    noteName: '笔记名称', cancel: '取消', confirm: '确定', useTemplate: '使用 Markdown参考模板',
+    noteName: '笔记名称', projectNameLabel: '项目名称', cancel: '取消', confirm: '确定', useTemplate: '使用 Markdown参考模板',
     useProjectTemplate: '使用 Markdown参考模板',
     templateStandard: 'Markdown参考模板', emptyHint: '点击上方+号新建笔记本项目，点击笔记本项目名称右侧+新建笔记页',
     tabLimit: '已达到上限，请关闭一个标签页', selectToStart: '选择项目或暂存区开始',
@@ -23,6 +25,11 @@ const translations = {
     storageChangeBtn: '更改…', storageReloadHint: '更改存储位置并确认后，界面将自动重新加载以载入新路径。',
     licenseStorageHint: '数据存储在本地知识库目录。您可在本页侧栏的「存储位置」中更改知识库根路径；具体目录结构说明见操作指南中的「存储位置」一节。',
     guideUninstall: '卸载程序', uninstallTitle: '卸载 LumNote', uninstallBtn: '卸载程序', uninstallHint: '将启动系统卸载向导，按提示完成卸载。', uninstallNotAvailable: '当前为开发/便携运行，卸载仅对通过安装包安装的版本可用。',
+    windowMinimize: '最小化', windowMaximize: '最大化', windowRestore: '还原', windowClose: '关闭',
+    sidebarFold: '折叠左栏',
+    inboxDefaultBody: '在此记录临时想法，稍后整理到项目中',
+    noteNamePlaceholder: '例如：2026-03-02.md',
+    startupFailed: '启动失败',
     authorLabel: '作者',
     authorName: 'Sciely Siu',
     readmeContent: `# 操作指南
@@ -110,11 +117,11 @@ limitations under the License.`
     openAttachment: 'Open file',
     toggleImageThumb: 'Thumbnail mode',
     toggleImageMarkdown: 'Markdown mode',
-    noteName: 'Note name', cancel: 'Cancel', confirm: 'OK', useTemplate: 'Use Markdown reference template',
+    noteName: 'Note name', projectNameLabel: 'Project name', cancel: 'Cancel', confirm: 'OK', useTemplate: 'Use Markdown reference template',
     useProjectTemplate: 'Use Markdown reference template',
     templateStandard: 'Markdown reference template', emptyHint: 'Click + above to create a project, click + next to project name to create a note',
     tabLimit: 'Tab limit reached. Close a tab first.', selectToStart: 'Select a project or inbox to start',
-    guide: 'Guide', fold: 'Fold', rename: 'Rename', closeTab: 'Close',
+    guide: 'Guide', fold: 'Fold', rename: 'Rename', closeTab: 'Close', confirmCloseWindow: 'Close this window?',
     guideReadme: 'LumNote Guide', guideLicense: 'License', guideVersion: 'Version', guideStorage: 'Storage', guideAndLicense: 'Guide & License',
     expandInbox: 'Expand inbox', foldInbox: 'Collapse inbox',
     storageTitle: 'Knowledge Base Location', storagePathLabel: 'Current path',
@@ -122,6 +129,13 @@ limitations under the License.`
     storageChangeBtn: 'Change…', storageReloadHint: 'After you choose a new folder and confirm, the window will reload to use the new path.',
     licenseStorageHint: 'Your data stays on disk under the knowledge base folder. Use Guide → Storage in the sidebar to change the root path; see the main guide for the folder layout.',
     guideUninstall: 'Uninstall', uninstallTitle: 'Uninstall LumNote', uninstallBtn: 'Uninstall', uninstallHint: 'This will start the system uninstaller. Follow the wizard to remove the app.', uninstallNotAvailable: 'Uninstall is only available for the installed version (not when running in dev or portable).',
+    windowMinimize: 'Minimize', windowMaximize: 'Maximize', windowRestore: 'Restore', windowClose: 'Close',
+    sidebarFold: 'Collapse sidebar',
+    inboxDefaultBody: 'Jot down quick ideas here; move them into project notes later.',
+    noteNamePlaceholder: 'e.g. 2026-03-02.md',
+    startupFailed: 'Startup failed',
+    authorLabel: 'Author',
+    authorName: 'Sciely Siu',
     readmeContent: `# LumNote Guide
 
 ## Basics
@@ -164,17 +178,42 @@ Licensed under the Apache License, Version 2.0...`
     copy: 'Copier', paste: 'Coller', cut: 'Couper', selectAll: 'Tout sélectionner', undo: 'Annuler', redo: 'Rétablir',
     moveToProject: 'Déplacer vers le projet', noProjects: 'Aucun projet', chooseProject: 'Choisir la cible',
     deleteSelection: 'Supprimer',
-    noteName: 'Nom de la note', cancel: 'Annuler', confirm: 'OK', useTemplate: 'Utiliser le modèle MD',
+    noteName: 'Nom de la note', projectNameLabel: 'Nom du projet', cancel: 'Annuler', confirm: 'OK', useTemplate: 'Utiliser le modèle MD',
     useProjectTemplate: 'Utiliser le modèle Markdown par défaut',
     templateStandard: 'Format standard', emptyHint: 'Créez un dossier dans Projects ou utilisez +',
     tabLimit: 'Limite atteinte. Fermez un onglet.', selectToStart: 'Sélectionnez un projet ou une boîte de réception',
-    guide: 'Guide', fold: 'Replier', guideReadme: 'Guide LumNote', guideLicense: 'Licence', guideVersion: 'Version', languageSettings: 'Langue', guideStorage: 'Stockage', guideAndLicense: 'Guide et licence',
+    guide: 'Guide', fold: 'Replier', rename: 'Renommer', closeTab: 'Fermer', confirmCloseWindow: 'Fermer cette fenêtre ?',
+    guideReadme: 'Guide LumNote', guideLicense: 'Licence', guideVersion: 'Version', languageSettings: 'Langue', guideStorage: 'Stockage', guideAndLicense: 'Guide et licence',
     expandInbox: 'Déplier la boîte de réception', foldInbox: 'Replier la boîte de réception',
     storageTitle: 'Emplacement de la base de connaissances', storagePathLabel: 'Chemin actuel',
     storagePathDesc: 'Racine : dossiers Projects et Inbox. Après changement de chemin, l’application se recharge ; sauvegardez vos données.',
     storageChangeBtn: 'Changer…', storageReloadHint: 'L’app se rechargera après modification.',
     licenseStorageHint: 'Données locales. Utilisez Guide → Stockage pour changer le dossier racine.',
     guideUninstall: 'Désinstaller', uninstallTitle: 'Désinstaller LumNote', uninstallBtn: 'Désinstaller', uninstallHint: 'Lance l’assistant de désinstallation.', uninstallNotAvailable: 'Disponible uniquement pour la version installée.',
+    windowMinimize: 'Réduire', windowMaximize: 'Agrandir', windowRestore: 'Restaurer', windowClose: 'Fermer',
+    sidebarFold: 'Replier la barre latérale',
+    inboxDefaultBody: 'Notez vos idées ici ; classez-les ensuite dans un projet.',
+    noteNamePlaceholder: 'ex. : 2026-03-02.md',
+    startupFailed: 'Échec du démarrage',
+    authorLabel: 'Auteur',
+    authorName: 'Sciely Siu',
+    licenseContent: `Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Copyright (c) LumNote
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`,
     readmeContent: `# Guide LumNote
 
 ## Bases
@@ -189,17 +228,42 @@ Licensed under the Apache License, Version 2.0...`
     copy: '복사', paste: '붙여넣기', cut: '잘라내기', selectAll: '전체 선택', undo: '실행 취소', redo: '다시 실행',
     moveToProject: '프로젝트로 이동', noProjects: '프로젝트 없음', chooseProject: '대상 선택',
     deleteSelection: '삭제',
-    noteName: '메모 이름', cancel: '취소', confirm: '확인', useTemplate: 'MD 템플릿 사용',
+    noteName: '메모 이름', projectNameLabel: '프로젝트 이름', cancel: '취소', confirm: '확인', useTemplate: 'MD 템플릿 사용',
     useProjectTemplate: '기본 Markdown 템플릿 사용',
     templateStandard: '표준 형식', emptyHint: 'Projects에 폴더를 만들거나 +를 사용하세요',
     tabLimit: '탭 한도 도달. 탭을 닫으세요.', selectToStart: '프로젝트 또는 받은편지함을 선택하세요',
-    guide: '가이드', fold: '접기', guideReadme: 'LumNote 가이드', guideLicense: '라이선스', guideVersion: '버전', languageSettings: '언어', guideStorage: '저장 위치', guideAndLicense: '가이드 및 라이선스',
+    guide: '가이드', fold: '접기', rename: '이름 바꾸기', closeTab: '닫기', confirmCloseWindow: '창을 닫을까요?',
+    guideReadme: 'LumNote 가이드', guideLicense: '라이선스', guideVersion: '버전', languageSettings: '언어', guideStorage: '저장 위치', guideAndLicense: '가이드 및 라이선스',
     expandInbox: '받은편지함 펼치기', foldInbox: '받은편지함 접기',
     storageTitle: '지식 베이스 위치', storagePathLabel: '현재 경로',
     storagePathDesc: '프로젝트는 Projects, 받은편지함은 Inbox 폴더에 저장됩니다. 경로 변경 후 앱이 다시 로드됩니다.',
     storageChangeBtn: '변경…', storageReloadHint: '변경 후 앱이 다시 로드됩니다.',
     licenseStorageHint: '데이터는 로컬에 저장됩니다. 가이드 → 저장 위치에서 루트 폴더를 변경할 수 있습니다.',
     guideUninstall: '제거', uninstallTitle: 'LumNote 제거', uninstallBtn: '제거', uninstallHint: '시스템 제거 마법사를 시작합니다.', uninstallNotAvailable: '설치된 버전에서만 사용할 수 있습니다.',
+    windowMinimize: '최소화', windowMaximize: '최대화', windowRestore: '복원', windowClose: '닫기',
+    sidebarFold: '사이드바 접기',
+    inboxDefaultBody: '여기에 임시 아이디어를 적고, 나중에 프로젝트 메모로 옮기세요.',
+    noteNamePlaceholder: '예: 2026-03-02.md',
+    startupFailed: '시작 실패',
+    authorLabel: '저자',
+    authorName: 'Sciely Siu',
+    licenseContent: `Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Copyright (c) LumNote
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`,
     readmeContent: `# LumNote 가이드
 
 ## 기본
@@ -213,17 +277,42 @@ Licensed under the Apache License, Version 2.0...`
     copy: 'Copia', paste: 'Incolla', cut: 'Taglia', selectAll: 'Seleziona tutto', undo: 'Annulla', redo: 'Ripeti',
     moveToProject: 'Sposta nel progetto', noProjects: 'Nessun progetto', chooseProject: 'Scegli destinazione',
     deleteSelection: 'Elimina',
-    noteName: 'Nome nota', cancel: 'Annulla', confirm: 'OK', useTemplate: 'Usa modello MD',
+    noteName: 'Nome nota', projectNameLabel: 'Nome progetto', cancel: 'Annulla', confirm: 'OK', useTemplate: 'Usa modello MD',
     useProjectTemplate: 'Usa modello Markdown predefinito',
     templateStandard: 'Formato standard', emptyHint: 'Crea cartella in Projects o usa +',
     tabLimit: 'Limite tab raggiunto. Chiudi un tab.', selectToStart: 'Seleziona un progetto o inbox',
-    guide: 'Guida', fold: 'Comprimi', guideReadme: 'Guida LumNote', guideLicense: 'Licenza', guideVersion: 'Versione', languageSettings: 'Lingua', guideStorage: 'Archiviazione', guideAndLicense: 'Guida e licenza',
+    guide: 'Guida', fold: 'Comprimi', rename: 'Rinomina', closeTab: 'Chiudi', confirmCloseWindow: 'Chiudere la finestra?',
+    guideReadme: 'Guida LumNote', guideLicense: 'Licenza', guideVersion: 'Versione', languageSettings: 'Lingua', guideStorage: 'Archiviazione', guideAndLicense: 'Guida e licenza',
     expandInbox: 'Espandi inbox', foldInbox: 'Comprimi inbox',
     storageTitle: 'Posizione base di conoscenza', storagePathLabel: 'Percorso attuale',
     storagePathDesc: 'Cartelle Projects e Inbox nella radice. Dopo il cambio percorso l\'app si ricarica.',
     storageChangeBtn: 'Cambia…', storageReloadHint: 'L\'app si ricaricherà dopo la modifica.',
     licenseStorageHint: 'Dati locali. Usa Guida → Archiviazione per cambiare la cartella radice.',
     guideUninstall: 'Disinstalla', uninstallTitle: 'Disinstalla LumNote', uninstallBtn: 'Disinstalla', uninstallHint: 'Si aprirà la disinstallazione di sistema.', uninstallNotAvailable: 'Solo per la versione installata.',
+    windowMinimize: 'Riduci a icona', windowMaximize: 'Ingrandisci', windowRestore: 'Ripristina', windowClose: 'Chiudi',
+    sidebarFold: 'Comprimi barra laterale',
+    inboxDefaultBody: 'Annota qui idee veloci; spostale poi nelle note di progetto.',
+    noteNamePlaceholder: 'es. 2026-03-02.md',
+    startupFailed: 'Avvio non riuscito',
+    authorLabel: 'Autore',
+    authorName: 'Sciely Siu',
+    licenseContent: `Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Copyright (c) LumNote
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`,
     readmeContent: `# Guida LumNote
 
 ## Base
@@ -237,23 +326,107 @@ Licensed under the Apache License, Version 2.0...`
     copy: 'コピー', paste: '貼り付け', cut: '切り取り', selectAll: 'すべて選択', undo: '元に戻す', redo: 'やり直す',
     moveToProject: 'プロジェクトに移動', noProjects: 'プロジェクトなし', chooseProject: 'ターゲットを選択',
     deleteSelection: '削除',
-    noteName: 'ノート名', cancel: 'キャンセル', confirm: 'OK', useTemplate: 'MDテンプレートを使用',
+    noteName: 'ノート名', projectNameLabel: 'プロジェクト名', cancel: 'キャンセル', confirm: 'OK', useTemplate: 'MDテンプレートを使用',
     useProjectTemplate: 'デフォルトMarkdownテンプレートを使用',
     templateStandard: '標準形式', emptyHint: 'Projectsにフォルダを作成するか、+を使用',
     tabLimit: 'タブ上限です。タブを閉じてください。', selectToStart: 'プロジェクトまたは受信箱を選択',
-    guide: 'ガイド', fold: '折りたたむ', guideReadme: 'LumNote ガイド', guideLicense: 'ライセンス', guideVersion: 'バージョン', languageSettings: '言語', guideStorage: '保存場所', guideAndLicense: 'ガイドとライセンス',
+    guide: 'ガイド', fold: '折りたたむ', rename: '名前を変更', closeTab: '閉じる', confirmCloseWindow: 'ウィンドウを閉じますか？',
+    guideReadme: 'LumNote ガイド', guideLicense: 'ライセンス', guideVersion: 'バージョン', languageSettings: '言語', guideStorage: '保存場所', guideAndLicense: 'ガイドとライセンス',
     expandInbox: '受信箱を展開', foldInbox: '受信箱を折りたたむ',
     storageTitle: 'ナレッジベースの場所', storagePathLabel: '現在のパス',
     storagePathDesc: 'Projects と Inbox がルート直下にあります。パス変更後にアプリが再読み込みされます。',
     storageChangeBtn: '変更…', storageReloadHint: '変更後にアプリが再読み込みされます。',
     licenseStorageHint: 'データはローカルに保存されます。ガイド → 保存場所でルートを変更できます。',
     guideUninstall: 'アンインストール', uninstallTitle: 'LumNote をアンインストール', uninstallBtn: 'アンインストール', uninstallHint: 'システムのアンインストールが起動します。', uninstallNotAvailable: 'インストール版でのみ利用できます。',
+    windowMinimize: '最小化', windowMaximize: '最大化', windowRestore: '元に戻す', windowClose: '閉じる',
+    sidebarFold: 'サイドバーを折りたたむ',
+    inboxDefaultBody: 'ここに思いつきをメモし、あとでプロジェクトノートへ移しましょう。',
+    noteNamePlaceholder: '例: 2026-03-02.md',
+    startupFailed: '起動に失敗しました',
+    authorLabel: '作者',
+    authorName: 'Sciely Siu',
+    licenseContent: `Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Copyright (c) LumNote
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`,
     readmeContent: `# LumNote ガイド
 
 ## 基本
 - **新規プロジェクト**: サイドバーの + をクリック
 - **新規ノート**: プロジェクトを右クリック → 新規ノート
 - **受信箱**: クイックキャプチャ用`
+  },
+  de: {
+    appTitle: 'LumNote', inbox: 'Eingang', projects: 'Projekte', newProject: 'Neues Projekt', newNote: 'Neue Notiz',
+    deleteProject: 'Projekt löschen', deleteNote: 'Notiz löschen', exportProject: 'Projekt exportieren', exportNote: 'Notiz exportieren',
+    copy: 'Kopieren', paste: 'Einfügen', cut: 'Ausschneiden', selectAll: 'Alles auswählen', undo: 'Rückgängig', redo: 'Wiederholen',
+    moveToProject: 'In Projekt verschieben', noProjects: 'Keine Projekte', chooseProject: 'Ziel wählen',
+    deleteSelection: 'Löschen',
+    insertFileAttachment: 'Datei einfügen',
+    openAttachment: 'Datei öffnen',
+    toggleImageThumb: 'Vorschaumodus',
+    toggleImageMarkdown: 'Markdown-Modus',
+    noteName: 'Notizname', projectNameLabel: 'Projektname', cancel: 'Abbrechen', confirm: 'OK', useTemplate: 'Markdown-Vorlage verwenden',
+    useProjectTemplate: 'Standard-Markdown-Vorlage verwenden',
+    templateStandard: 'Markdown-Vorlage', emptyHint: 'Oben + für ein Projekt; + neben dem Projektnamen für eine Notiz',
+    tabLimit: 'Tab-Limit erreicht. Schließen Sie einen Tab.', selectToStart: 'Projekt oder Eingang wählen',
+    guide: 'Anleitung', fold: 'Einklappen', rename: 'Umbenennen', closeTab: 'Schließen', confirmCloseWindow: 'Fenster schließen?',
+    guideReadme: 'LumNote-Anleitung', guideLicense: 'Lizenz', guideVersion: 'Version', languageSettings: 'Sprache', guideStorage: 'Speicherort', guideAndLicense: 'Anleitung & Lizenz',
+    expandInbox: 'Eingang einblenden', foldInbox: 'Eingang ausblenden',
+    storageTitle: 'Speicherort der Wissensdatenbank', storagePathLabel: 'Aktueller Pfad',
+    storagePathDesc: 'Dieser Ordner ist die Wurzel: „Projects“ enthält Notizbücher; „Inbox“ eine .md-Datei pro Tag. Nach Pfadänderung startet die App neu — vorher sichern.',
+    storageChangeBtn: 'Ändern…', storageReloadHint: 'Nach Auswahl eines neuen Ordners lädt die App neu.',
+    licenseStorageHint: 'Daten liegen lokal. Anleitung → Speicherort zum Ändern des Stammordners.',
+    guideUninstall: 'Deinstallieren', uninstallTitle: 'LumNote deinstallieren', uninstallBtn: 'Deinstallieren', uninstallHint: 'Startet den System-Deinstaller.', uninstallNotAvailable: 'Nur bei installierter Version verfügbar.',
+    windowMinimize: 'Minimieren', windowMaximize: 'Maximieren', windowRestore: 'Wiederherstellen', windowClose: 'Schließen',
+    sidebarFold: 'Seitenleiste einklappen',
+    inboxDefaultBody: 'Hier kurz notieren; später in Projektnotizen übernehmen.',
+    noteNamePlaceholder: 'z. B. 2026-03-02.md',
+    startupFailed: 'Start fehlgeschlagen',
+    authorLabel: 'Autor',
+    authorName: 'Sciely Siu',
+    licenseContent: `Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Copyright (c) LumNote
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`,
+    readmeContent: `# LumNote-Anleitung
+
+## Grundlagen
+- **Neues Projekt**: + in der Seitenleiste
+- **Neue Notiz**: Rechtsklick auf Projekt → Neue Notiz
+- **Eingang**: Schnelle Erfassung; **Zwei Spalten** über die Tab-Leiste
+
+## Aufbewahrung
+- Tägliche Dateien \`Inbox/YYYY-MM-DD.md\`; ältere als 90 Tage werden beim Start oder beim Öffnen des Eingangs gelöscht.
+
+## Speicher
+- **Anleitung → Speicherort**: Pfad anzeigen und ändern (App lädt neu).`
   }
 };
 
@@ -261,21 +434,34 @@ function getLang() {
   const stored = localStorage.getItem('lumen_lang');
   if (stored && translations[stored]) return stored;
   const nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
-  for (const [code] of Object.entries(translations)) {
-    if (nav.startsWith(code) || nav.startsWith(LANGS[code])) return code;
+  for (const code of LANG_DETECTION_ORDER) {
+    if (!translations[code]) continue;
+    const bcp = (LANGS[code] || code).toLowerCase();
+    if (nav === code || nav.startsWith(`${code}-`) || nav === bcp || nav.startsWith(`${bcp}-`)) return code;
   }
   return DEFAULT_LANG;
+}
+
+function syncDocumentLang() {
+  const code = getLang();
+  document.documentElement.lang = LANGS[code] || code || 'en';
 }
 
 function setLang(code) {
   if (translations[code]) {
     localStorage.setItem('lumen_lang', code);
-    document.documentElement.lang = LANGS[code] || code;
+    syncDocumentLang();
   }
 }
 window.setLang = setLang;
+window.syncDocumentLang = syncDocumentLang;
 
 function t(key) {
   const lang = getLang();
-  return (translations[lang] && translations[lang][key]) || translations[DEFAULT_LANG][key] || key;
+  const cur = translations[lang];
+  if (cur && Object.prototype.hasOwnProperty.call(cur, key)) return cur[key];
+  const def = translations[DEFAULT_LANG];
+  if (def && Object.prototype.hasOwnProperty.call(def, key)) return def[key];
+  return key;
 }
+window.t = t;

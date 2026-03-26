@@ -10,7 +10,7 @@
     "dist": "electron-builder",
     "dist:clean": "node -e \"try{require('fs').rmSync('dist',{recursive:true,force:true})}catch(e){}\" && electron-builder"
   },
-  "author": "",
+  "author": "Sciely Siu",
   "license": "Apache-2.0",
   "build": {
     "appId": "com.lumnote.app",
@@ -19,25 +19,47 @@
       "output": "dist"
     },
     "files": [
-      "main/**",
-      "renderer/**",
-      "assets/**",
-      "ico.png"
+      "main/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      "assets/icons/**/*"
     ],
     "icon": "assets/icons/ico.png",
     "win": {
       "target": "nsis",
-      "requestedExecutionLevel": "asInvoker"
+      "requestedExecutionLevel": "asInvoker",
+      "icon": "assets/icons/ico.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerLanguages": ["zh-CN", "en"],
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerLanguages": [
+        "zh_CN",
+        "en_US"
+      ],
       "language": "2052"
     },
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.productivity"
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "assets/icons/icon.icns",
+      "darkModeSupport": true
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "assets/icons"
     }
   },
   "devDependencies": {
